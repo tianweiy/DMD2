@@ -1,4 +1,4 @@
-# Improved Distribution Matching Distillation for Fast Image Synthesis
+# Improved Distribution Matching Distillation for Fast Image Synthesis [[demo](https://4e4a5c6a8b08f76802.gradio.live)]
 
 Few-step Text-to-Image Generation.
 
@@ -66,7 +66,7 @@ python demo/imagenet_example.py  --checkpoint_path IMAGENET_CKPT_PATH
 To try our text-to-image generation demo, run:
 
 ```.bash
-python demo/text_to_image_sdxl.py --checkpoint_path SDXL_CKPT_PATH 
+python demo/text_to_image_sdxl.py --checkpoint_path SDXL_CKPT_PATH --half_precision
 ```
 
 Pretrained models can be found in [ImageNet](experiments/imagenet/README.md) and [SDXL](experiments/sdxl/README.md). 

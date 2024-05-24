@@ -6,7 +6,7 @@ Few-step Text-to-Image Generation.
 
 > [**Improved Distribution Matching Distillation for Fast Image Synthesis**](https://tianweiy.github.io/dmd2/dmd2.pdf),            
 > Tianwei Yin, Michaël Gharbi, Taesung Park, Richard Zhang, Eli Shechtman, Frédo Durand, William T. Freeman        
-> *arXiv technical report ([arXiv xxxx.xxxxx](https://arxiv.org/abs/xxxx.xxxxx))*  
+> *arXiv technical report ([arXiv 2405.14867](https://tianweiy.github.io/dmd2/dmd2.pdf))*  
 
 ## Contact 
 
@@ -101,7 +101,7 @@ If you find DMD2 useful or relevant to your research, please kindly cite our pap
 @article{yin2024improved,
     title={Improved Distribution Matching Distillation for Fast Image Synthesis},
     author={Yin, Tianwei and Gharbi, Micha{\"e}l and Park, Taesung and Zhang, Richard and Shechtman, Eli and Durand, Fredo and Freeman, William T},
-    journal={arXiv:xxxx.xxxxx},
+    journal={arXiv 2405.14867},
     year={2024}
 }
 

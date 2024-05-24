@@ -7,6 +7,8 @@
 | [sdxl_cond999_8node_lr5e-7_denoising4step_diffusion1000_gan5e-3_guidance8_noinit_noode_backsim_scratch](./sdxl_cond999_8node_lr5e-7_denoising4step_diffusion1000_gan5e-3_guidance8_noinit_noode_backsim_scratch.sh) | 19.32 | [link](https://huggingface.co/tianweiy/DMD2/tree/main/model/sdxl/sdxl_cond999_8node_lr5e-7_denoising4step_diffusion1000_gan5e-3_guidance8_noinit_noode_backsim_scratch_checkpoint_model_019000) | 19k | 57 |
 | [sdxl_cond399_8node_lr5e-7_1step_diffusion1000_gan5e-3_guidance8_noinit_noode](./laion6.25_sd_baseline_8node_guidance1.75_lr5e-7_seed10_dfake10_diffusion1000_gan1e-3_resume.sh) | 19.01 | TBD | TBD | TBD |
 
+1-step model needs some special handling, we will support it soon. 
+
 For inference with our models, you only need to download the pytorch_model.bin file from the provided link. For fine-tuning, you will need to download the entire folder.
 You can use the following script for that:
 
@@ -41,8 +43,8 @@ You can also add these few export to the bashrc file so that you don't need to r
 ### Sample Training/Testing Commands 
 
 ```bash
-# start a training with 64 gpu. we need to run this script on all 8 nodes. Please change the EXP_NAME and RANK_ID accordingly.  
-bash experiments/sdxl/sdxl_cond999_8node_lr5e-7_denoising4step_diffusion1000_gan5e-3_guidance8_noinit_noode_backsim_scratch.sh $CHECKPOINT_PATH $WANDB_ENTITY $WANDB_PROJECT fsdp_configs/EXP_NAME RANK_ID 
+# start a training with 64 gpu. we need to run this script on all 8 nodes. Please change the EXP_NAME and NODE_RANK_ID accordingly.  
+bash experiments/sdxl/sdxl_cond999_8node_lr5e-7_denoising4step_diffusion1000_gan5e-3_guidance8_noinit_noode_backsim_scratch.sh $CHECKPOINT_PATH $WANDB_ENTITY $WANDB_PROJECT fsdp_configs/EXP_NAME NODE_RANK_ID 
 
 # on some other machine, start a testing process that continually reads from the checkpoint folder and evaluate the FID 
 # Change TIMESTAMP_TBD to the real one
@@ -50,8 +52,8 @@ python main/sdxl/test_folder_sdxl.py \
     --folder $CHECKPOINT_PATH/sdxl_cond999_8node_lr5e-7_denoising4step_diffusion1000_gan5e-3_guidance8_noinit_noode_backsim_scratch/TIMESTAMP_TBD/ \
     --conditioning_timestep 999 --num_step 4 --wandb_entity $WANDB_ENTITY \
     --wandb_project $WANDB_PROJECT --num_train_timesteps 1000 \
-    --seed 10 --eval_res 512 --ref_dir $WANDB_PROJECT/coco10k/subset \
-    --anno_path  $WANDB_PROJECT/all_prompts.pkl \
+    --seed 10 --eval_res 512 --ref_dir $CHECKPOINT_PATH/coco10k/subset \
+    --anno_path  $CHECKPOINT_PATH/coco10k/all_prompts.pkl \
     --total_eval_samples 10000 --clip_score \
     --wandb_name test_sdxl_cond999_8node_lr5e-7_denoising4step_diffusion1000_gan5e-3_guidance8_noinit_noode_backsim_scratch
 ```

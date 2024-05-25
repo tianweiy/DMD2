@@ -10,7 +10,7 @@ import torch
 import time 
 import PIL
     
-SAFETY_CHECKER = True
+SAFETY_CHECKER = False
 
 class ModelWrapper:
     def __init__(self, args, accelerator):
@@ -300,8 +300,9 @@ def create_demo():
 
 if __name__ == "__main__":
     demo = create_demo()
-    demo.queue(api_open=False)
+    demo.queue(api_open=True)
     demo.launch(
+        server_name="0.0.0.0",
         show_error=True,
         share=True
     )

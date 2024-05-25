@@ -10,6 +10,7 @@ import torch
 import time 
 import PIL
     
+SAFETY_CHECKER = True
 
 class ModelWrapper:
     def __init__(self, args, accelerator):
@@ -59,6 +60,27 @@ class ModelWrapper:
         # sampling parameters 
         self.num_step = args.num_step 
         self.conditioning_timestep = args.conditioning_timestep 
+
+        # safety checker 
+        if SAFETY_CHECKER:
+            # adopted from https://huggingface.co/spaces/ByteDance/SDXL-Lightning/raw/main/app.py
+            from demo.safety_checker import StableDiffusionSafetyChecker
+            from transformers import CLIPFeatureExtractor
+
+            self.safety_checker = StableDiffusionSafetyChecker.from_pretrained(
+                "CompVis/stable-diffusion-safety-checker"
+            ).to(self.device)
+            self.feature_extractor = CLIPFeatureExtractor.from_pretrained(
+                "openai/clip-vit-base-patch32", 
+            )
+
+    def check_nsfw_images(self, images):
+        safety_checker_input = self.feature_extractor(images, return_tensors="pt") # .to(self.dviece)
+        has_nsfw_concepts = self.safety_checker(
+            clip_input=safety_checker_input.pixel_values.to(self.device),
+            images=images
+        )
+        return has_nsfw_concepts
 
     def create_generator(self, args):
         generator = UNet2DConditionModel.from_pretrained(
@@ -196,6 +218,11 @@ class ModelWrapper:
         for image in eval_images:
             output_image_list.append(PIL.Image.fromarray(image.cpu().numpy()))
 
+        if SAFETY_CHECKER:
+            has_nsfw_concepts = self.check_nsfw_images(output_image_list)
+            if any(has_nsfw_concepts):
+                return [PIL.Image.new("RGB", (512, 512))], "NSFW concepts detected. Please try a different prompt."
+
         return (
             output_image_list,
             f"run successfully in {(end_time-start_time):.2f} seconds"
@@ -258,7 +285,7 @@ def create_demo():
                         info="If set to -1, a different seed will be used each time.",
                     )
             with gr.Column():
-                result = gr.Gallery(label="Generated Images", show_label=False, elem_id="gallery")
+                result = gr.Gallery(label="Generated Images", show_label=False, elem_id="gallery", height=1024)
 
                 error_message = gr.Text(label="Job Status")
 

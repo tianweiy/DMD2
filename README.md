@@ -4,9 +4,9 @@ Few-step Text-to-Image Generation.
 
 ![image/jpeg](docs/teaser.jpg)
 
-> [**Improved Distribution Matching Distillation for Fast Image Synthesis**](https://tianweiy.github.io/dmd2/dmd2.pdf),            
+> [**Improved Distribution Matching Distillation for Fast Image Synthesis**](https://tianweiy.github.io/dmd2/),            
 > Tianwei Yin, Michaël Gharbi, Taesung Park, Richard Zhang, Eli Shechtman, Frédo Durand, William T. Freeman        
-> *arXiv technical report ([arXiv 2405.14867](https://tianweiy.github.io/dmd2/dmd2.pdf))*  
+> *arXiv technical report ([arXiv 2405.14867](https://arxiv.org/abs/2405.14867))*  
 
 ## Contact 
 
@@ -66,7 +66,12 @@ python demo/imagenet_example.py  --checkpoint_path IMAGENET_CKPT_PATH
 To try our text-to-image generation demo, run:
 
 ```.bash
+
+# 4 step (much higher quality, 2X slower)
 python demo/text_to_image_sdxl.py --checkpoint_path SDXL_CKPT_PATH --half_precision
+
+# 1 step 
+python demo/text_to_image_sdxl.py --num_step 1 --checkpoint_path SDXL_CKPT_PATH  --half_precision  --conditioning_timestep 399
 ```
 
 Pretrained models can be found in [ImageNet](experiments/imagenet/README.md) and [SDXL](experiments/sdxl/README.md). 

@@ -56,6 +56,10 @@ class ModelWrapper:
         )
         self.alphas_cumprod = self.scheduler.alphas_cumprod.to(self.device)
 
+        # sampling parameters 
+        self.num_step = args.num_step 
+        self.conditioning_timestep = args.conditioning_timestep 
+
     def create_generator(self, args):
         generator = UNet2DConditionModel.from_pretrained(
             args.model_id,
@@ -105,14 +109,14 @@ class ModelWrapper:
         return time.time()
 
     def sample(
-        self, noise, unet_added_conditions, prompt_embed,
-        num_step=4, conditioning_timestep=999
+        self, noise, unet_added_conditions, prompt_embed
     ):
         alphas_cumprod = self.scheduler.alphas_cumprod.to(self.device)
 
-        if num_step == 1:
-            raise NotImplementedError("will be supported in future versions")
-        elif num_step == 4:
+        if self.num_step == 1:
+            all_timesteps = [self.conditioning_timestep]
+            step_interval = 0 
+        elif self.num_step == 4:
             all_timesteps = [999, 749, 499, 249]
             step_interval = 250 
         else:
@@ -145,9 +149,7 @@ class ModelWrapper:
         self,
         prompt: str,
         seed: int,
-        num_step: int=4,
         num_images: int=1,
-        conditioning_timestep: int=999
     ):
         print("Running model inference...")
 
@@ -185,8 +187,7 @@ class ModelWrapper:
         eval_images = self.sample(
             noise=noise,
             unet_added_conditions=unet_added_conditions,
-            prompt_embed=batch_prompt_embeds,
-            num_step=num_step
+            prompt_embed=batch_prompt_embeds
         )
 
         end_time = self._get_time()
@@ -211,6 +212,7 @@ def create_demo():
     parser.add_argument("--model_id", type=str, default="stabilityai/stable-diffusion-xl-base-1.0")
     parser.add_argument("--half_precision", action="store_true")
     parser.add_argument("--conditioning_timestep", type=int, default=999)
+    parser.add_argument("--num_step", type=int, default=4, choices=[1, 4])
     parser.add_argument("--revision", type=str)
     args = parser.parse_args()
 

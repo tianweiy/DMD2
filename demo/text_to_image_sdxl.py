@@ -1,4 +1,4 @@
-from diffusers import UNet2DConditionModel, AutoencoderKL, DDIMScheduler
+from diffusers import UNet2DConditionModel, AutoencoderKL, DDIMScheduler, AutoencoderTiny
 from main.sdxl.sdxl_text_encoder import SDXLTextEncoder
 from main.utils import get_x0_from_noise
 from transformers import AutoTokenizer
@@ -10,7 +10,7 @@ import torch
 import time 
 import PIL
     
-SAFETY_CHECKER = True
+SAFETY_CHECKER = False
 
 class ModelWrapper:
     def __init__(self, args, accelerator):
@@ -18,8 +18,10 @@ class ModelWrapper:
         # disable all gradient calculations
         torch.set_grad_enabled(False)
         
-        if args.half_precision:
-            self.DTYPE = torch.bfloat16 
+        if args.precision == "bfloat16":
+            self.DTYPE = torch.bfloat16
+        elif args.precision == "float16":
+            self.DTYPE = torch.float16
         else:
             self.DTYPE = torch.float32
         self.device = accelerator.device
@@ -34,11 +36,17 @@ class ModelWrapper:
 
         self.text_encoder = SDXLTextEncoder(args, accelerator).to(dtype=self.DTYPE)
 
-        # Initialize AutoEncoder (keep in fp32 for numerical stability)
-        self.vae = AutoencoderKL.from_pretrained(
-            args.model_id, 
-            subfolder="vae"
-        ).to(self.device).float()
+        # Initialize AutoEncoder with specified model and dtype
+        if args.use_tiny_vae:
+            self.vae = AutoencoderTiny.from_pretrained(
+                "madebyollin/taesdxl", 
+                torch_dtype=self.DTYPE
+            ).to(self.device)
+        else:
+            self.vae = AutoencoderKL.from_pretrained(
+                args.model_id, 
+                subfolder="vae"
+            ).to(self.device).float()
 
         # Initialize Generator
         self.model = self.create_generator(args).to(dtype=self.DTYPE).to(self.device)
@@ -86,7 +94,7 @@ class ModelWrapper:
         generator = UNet2DConditionModel.from_pretrained(
             args.model_id,
             subfolder="unet"
-        ).float()
+        ).to(self.DTYPE)
 
         state_dict = torch.load(args.checkpoint_path, map_location="cpu")
         print(generator.load_state_dict(state_dict, strict=True))
@@ -154,7 +162,7 @@ class ModelWrapper:
 
             eval_images = get_x0_from_noise(
                 noise, eval_images, alphas_cumprod, current_timesteps
-            ).float()
+            ).to(self.DTYPE)
 
             next_timestep = current_timesteps - step_interval 
             noise = self.scheduler.add_noise(
@@ -182,9 +190,6 @@ class ModelWrapper:
 
         add_time_ids = self.base_add_time_ids.repeat(num_images, 1)
 
-        # NOTE: for FP16 inference, we need to create a noise vector at full precision and then cast to fp16 
-        # instead of creating a half precision noise at the beginning.
-        # this ensures consistent results with full precision.
         noise = torch.randn(
             num_images, 4, self.latent_resolution, self.latent_resolution, 
             generator=generator
@@ -237,7 +242,8 @@ def create_demo():
     parser.add_argument("--num_train_timesteps", type=int, default=1000)
     parser.add_argument("--checkpoint_path", type=str)
     parser.add_argument("--model_id", type=str, default="stabilityai/stable-diffusion-xl-base-1.0")
-    parser.add_argument("--half_precision", action="store_true")
+    parser.add_argument("--precision", type=str, default="float32", choices=["float32", "float16", "bfloat16"])
+    parser.add_argument("--use_tiny_vae", action="store_true")
     parser.add_argument("--conditioning_timestep", type=int, default=999)
     parser.add_argument("--num_step", type=int, default=4, choices=[1, 4])
     parser.add_argument("--revision", type=str)
@@ -259,21 +265,6 @@ def create_demo():
                     label="Prompt",
                     placeholder='e.g. children'
                 )
-                # num_images = gr.Slider(
-                #     label="Number of generated images",
-                #     minimum=1,
-                #     maximum=16,
-                #     step=1,
-                #     value=1,
-                # )
-                # num_step = gr.Slider(
-                #     label="Sample step",
-                #     minimum=1,
-                #     maximum=4,
-                #     step=1,
-                #     value=4,
-                #     visible=True
-                # )
                 run_button = gr.Button("Run")
                 with gr.Accordion(label="Advanced options", open=False):
                     seed = gr.Slider(
@@ -284,6 +275,13 @@ def create_demo():
                         value=0,
                         info="If set to -1, a different seed will be used each time.",
                     )
+                    num_images = gr.Slider(
+                        label="Number of generated images",
+                        minimum=1,
+                        maximum=16,
+                        step=1,
+                        value=1,
+                    )
             with gr.Column():
                 result = gr.Gallery(label="Generated Images", show_label=False, elem_id="gallery", height=1024)
 
@@ -291,7 +289,8 @@ def create_demo():
 
         inputs = [
             prompt,
-            seed
+            seed,
+            num_images
         ]
         run_button.click(
             fn=model.inference, inputs=inputs, outputs=[result, error_message]
@@ -301,8 +300,9 @@ def create_demo():
 
 if __name__ == "__main__":
     demo = create_demo()
-    demo.queue(api_open=False)
+    demo.queue(api_open=True)
     demo.launch(
+        server_name="0.0.0.0",
         show_error=True,
         share=True
     )

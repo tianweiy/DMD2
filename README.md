@@ -60,7 +60,7 @@ python setup.py  develop
 To reproduce our ImageNet results, run:
 
 ```.bash
-python demo/imagenet_example.py  --checkpoint_path IMAGENET_CKPT_PATH 
+python -m demo.imagenet_example  --checkpoint_path IMAGENET_CKPT_PATH 
 ```
 
 To try our text-to-image generation demo, run:
@@ -68,10 +68,13 @@ To try our text-to-image generation demo, run:
 ```.bash
 
 # 4 step (much higher quality, 2X slower)
-python demo/text_to_image_sdxl.py --checkpoint_path SDXL_CKPT_PATH --half_precision
+python -m demo.text_to_image_sdxl --checkpoint_path SDXL_CKPT_PATH --precision bfloat16
+
+# Higher speed (roughly 2x) by using float16 and a Tiny VAE from [madebyollin](https://huggingface.co/madebyollin/taesdxl)
+python -m demo.text_to_image_sdxl --checkpoint_path SDXL_CKPT_PATH --use_tiny_vae --precision float16
 
 # 1 step 
-python demo/text_to_image_sdxl.py --num_step 1 --checkpoint_path SDXL_CKPT_PATH  --half_precision  --conditioning_timestep 399
+python -m demo.text_to_image_sdxl --num_step 1 --checkpoint_path SDXL_CKPT_PATH --precision bfloat16 --conditioning_timestep 399
 ```
 
 Pretrained models can be found in [ImageNet](experiments/imagenet/README.md) and [SDXL](experiments/sdxl/README.md). 
@@ -125,3 +128,4 @@ If you find DMD2 useful or relevant to your research, please kindly cite our pap
 ## Acknowledgments 
 
 This work was done while Tianwei Yin was a full-time student at MIT. It was developed based on our reimplementation of the original DMD paper. This work was supported by the National Science Foundation under Cooperative Agreement PHY-2019786 (The NSF AI Institute for Artificial Intelligence and Fundamental Interactions, http://iaifi.org/), by NSF Grant 2105819, by NSF CISE award 1955864, and by funding from Google, GIST, Amazon, and Quanta Computer.
+

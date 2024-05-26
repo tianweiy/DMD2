@@ -66,9 +66,9 @@ python -m demo.imagenet_example  --checkpoint_path IMAGENET_CKPT_PATH
 To try our text-to-image generation demo, run:
 
 ```.bash
+# Note: on the demo page, click ``Use Tiny VAE for faster decoding'' to enable much faster speed and lower memory consumption using a Tiny VAE from [madebyollin](https://huggingface.co/madebyollin/taesdxl)
 
 # 4 step (much higher quality than 1 step)
-# Note: on the demo page, click ``Use Tiny VAE for faster decoding'' to enable much faster speed and lower memory consumption using a Tiny VAE from [madebyollin](https://huggingface.co/madebyollin/taesdxl)
 python -m demo.text_to_image_sdxl --checkpoint_path SDXL_CKPT_PATH --precision float16
 
 # 1 step 

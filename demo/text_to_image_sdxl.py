@@ -10,7 +10,7 @@ import torch
 import time 
 import PIL
     
-SAFETY_CHECKER = True
+SAFETY_CHECKER = False
 
 class ModelWrapper:
     def __init__(self, args, accelerator):
@@ -266,9 +266,9 @@ def create_demo():
         with gr.Row():
             with gr.Column():
                 prompt = gr.Text(
-                    value="children",
+                    value="An oil painting of two rabbits in the style of American Gothic, wearing the same clothes as in the original.",
                     label="Prompt",
-                    placeholder='e.g. children'
+                    placeholder='e.g. An oil painting of two rabbits in the style of American Gothic, wearing the same clothes as in the original.'
                 )
                 run_button = gr.Button("Run")
                 with gr.Accordion(label="Advanced options", open=True):
@@ -285,11 +285,12 @@ def create_demo():
                         minimum=1,
                         maximum=16,
                         step=1,
-                        value=1,
+                        value=16,
+                        info="Use smaller number if you get out of memory error."
                     )
                     fast_vae_decode = gr.Checkbox(
                         label="Use Tiny VAE for faster decoding",
-                        value=False
+                        value=True
                     )
             with gr.Column():
                 result = gr.Gallery(label="Generated Images", show_label=False, elem_id="gallery", height=1024)

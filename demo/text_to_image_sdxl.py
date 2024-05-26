@@ -10,7 +10,7 @@ import torch
 import time 
 import PIL
     
-SAFETY_CHECKER = False
+SAFETY_CHECKER = True
 
 class ModelWrapper:
     def __init__(self, args, accelerator):
@@ -34,19 +34,20 @@ class ModelWrapper:
             args.model_id, subfolder="tokenizer", revision=args.revision, use_fast=False
         )
 
-        self.text_encoder = SDXLTextEncoder(args, accelerator).to(dtype=self.DTYPE)
+        self.text_encoder = SDXLTextEncoder(args, accelerator, dtype=self.DTYPE)
 
-        # Initialize AutoEncoder with specified model and dtype
-        if args.use_tiny_vae:
-            self.vae = AutoencoderTiny.from_pretrained(
-                "madebyollin/taesdxl", 
-                torch_dtype=self.DTYPE
-            ).to(self.device)
-        else:
-            self.vae = AutoencoderKL.from_pretrained(
-                args.model_id, 
-                subfolder="vae"
-            ).to(self.device).float()
+        # vanilla SDXL VAE needs to be kept in float32
+        self.vae = AutoencoderKL.from_pretrained(
+            args.model_id, 
+            subfolder="vae"
+        ).float().to(self.device)
+        self.vae_dtype = torch.float32
+
+        self.tiny_vae = AutoencoderTiny.from_pretrained(
+            "madebyollin/taesdxl", 
+            torch_dtype=self.DTYPE
+        ).to(self.device) 
+        self.tiny_vae_dtype = self.DTYPE
 
         # Initialize Generator
         self.model = self.create_generator(args).to(dtype=self.DTYPE).to(self.device)
@@ -77,7 +78,7 @@ class ModelWrapper:
 
             self.safety_checker = StableDiffusionSafetyChecker.from_pretrained(
                 "CompVis/stable-diffusion-safety-checker"
-            ).to(self.device)
+            ).to(device=self.device, dtype=self.DTYPE)
             self.feature_extractor = CLIPFeatureExtractor.from_pretrained(
                 "openai/clip-vit-base-patch32", 
             )
@@ -85,7 +86,7 @@ class ModelWrapper:
     def check_nsfw_images(self, images):
         safety_checker_input = self.feature_extractor(images, return_tensors="pt") # .to(self.dviece)
         has_nsfw_concepts = self.safety_checker(
-            clip_input=safety_checker_input.pixel_values.to(self.device),
+            clip_input=safety_checker_input.pixel_values.to(device=self.device, dtype=self.DTYPE),
             images=images
         )
         return has_nsfw_concepts
@@ -139,7 +140,7 @@ class ModelWrapper:
         return time.time()
 
     def sample(
-        self, noise, unet_added_conditions, prompt_embed
+        self, noise, unet_added_conditions, prompt_embed, fast_vae_decode
     ):
         alphas_cumprod = self.scheduler.alphas_cumprod.to(self.device)
 
@@ -169,7 +170,10 @@ class ModelWrapper:
                 eval_images, torch.randn_like(eval_images), next_timestep
             ).to(DTYPE)  
 
-        eval_images = self.vae.decode(eval_images / self.vae.config.scaling_factor, return_dict=False)[0]
+        if fast_vae_decode:
+            eval_images = self.tiny_vae.decode(eval_images.to(self.tiny_vae_dtype) / self.tiny_vae.config.scaling_factor, return_dict=False)[0]
+        else:
+            eval_images = self.vae.decode(eval_images.to(self.vae_dtype) / self.vae.config.scaling_factor, return_dict=False)[0]
         eval_images = ((eval_images + 1.0) * 127.5).clamp(0, 255).to(torch.uint8).permute(0, 2, 3, 1)
         return eval_images 
 
@@ -179,7 +183,8 @@ class ModelWrapper:
         self,
         prompt: str,
         seed: int,
-        num_images: int=1,
+        num_images: int,
+        fast_vae_decode: bool
     ):
         print("Running model inference...")
 
@@ -214,7 +219,8 @@ class ModelWrapper:
         eval_images = self.sample(
             noise=noise,
             unet_added_conditions=unet_added_conditions,
-            prompt_embed=batch_prompt_embeds
+            prompt_embed=batch_prompt_embeds,
+            fast_vae_decode=fast_vae_decode
         )
 
         end_time = self._get_time()
@@ -243,7 +249,6 @@ def create_demo():
     parser.add_argument("--checkpoint_path", type=str)
     parser.add_argument("--model_id", type=str, default="stabilityai/stable-diffusion-xl-base-1.0")
     parser.add_argument("--precision", type=str, default="float32", choices=["float32", "float16", "bfloat16"])
-    parser.add_argument("--use_tiny_vae", action="store_true")
     parser.add_argument("--conditioning_timestep", type=int, default=999)
     parser.add_argument("--num_step", type=int, default=4, choices=[1, 4])
     parser.add_argument("--revision", type=str)
@@ -266,7 +271,7 @@ def create_demo():
                     placeholder='e.g. children'
                 )
                 run_button = gr.Button("Run")
-                with gr.Accordion(label="Advanced options", open=False):
+                with gr.Accordion(label="Advanced options", open=True):
                     seed = gr.Slider(
                         label="Seed",
                         minimum=-1,
@@ -282,6 +287,10 @@ def create_demo():
                         step=1,
                         value=1,
                     )
+                    fast_vae_decode = gr.Checkbox(
+                        label="Use Tiny VAE for faster decoding",
+                        value=False
+                    )
             with gr.Column():
                 result = gr.Gallery(label="Generated Images", show_label=False, elem_id="gallery", height=1024)
 
@@ -290,19 +299,19 @@ def create_demo():
         inputs = [
             prompt,
             seed,
-            num_images
+            num_images,
+            fast_vae_decode
         ]
         run_button.click(
-            fn=model.inference, inputs=inputs, outputs=[result, error_message]
+            fn=model.inference, inputs=inputs, outputs=[result, error_message], concurrency_limit=1
         )
     return demo
 
 
 if __name__ == "__main__":
     demo = create_demo()
-    demo.queue(api_open=True)
+    demo.queue(api_open=False)
     demo.launch(
-        server_name="0.0.0.0",
         show_error=True,
         share=True
     )

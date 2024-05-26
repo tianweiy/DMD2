@@ -67,14 +67,12 @@ To try our text-to-image generation demo, run:
 
 ```.bash
 
-# 4 step (much higher quality, 2X slower)
-python -m demo.text_to_image_sdxl --checkpoint_path SDXL_CKPT_PATH --precision bfloat16
-
-# Higher speed (roughly 2x) by using float16 and a Tiny VAE from [madebyollin](https://huggingface.co/madebyollin/taesdxl)
-python -m demo.text_to_image_sdxl --checkpoint_path SDXL_CKPT_PATH --use_tiny_vae --precision float16
+# 4 step (much higher quality than 1 step)
+# Note: on the demo page, click ``Use Tiny VAE for faster decoding'' to enable much faster speed and lower memory consumption using a Tiny VAE from [madebyollin](https://huggingface.co/madebyollin/taesdxl)
+python -m demo.text_to_image_sdxl --checkpoint_path SDXL_CKPT_PATH --precision float16
 
 # 1 step 
-python -m demo.text_to_image_sdxl --num_step 1 --checkpoint_path SDXL_CKPT_PATH --precision bfloat16 --conditioning_timestep 399
+python -m demo.text_to_image_sdxl --num_step 1 --checkpoint_path SDXL_CKPT_PATH --precision float16 --conditioning_timestep 399
 ```
 
 Pretrained models can be found in [ImageNet](experiments/imagenet/README.md) and [SDXL](experiments/sdxl/README.md). 

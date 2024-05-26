@@ -51,7 +51,7 @@ conda activate dmd2
 
 pip install --upgrade anyio
 pip install torch==2.0.1  torchvision==0.15.2
-pip install  --upgrade diffusers wandb lmdb transformers accelerate==0.23.0 lmdb datasets evaluate  scipy opencv-python matplotlib imageio piq==0.7.0 safetensors gradio
+pip install  --upgrade diffusers peft wandb lmdb transformers accelerate==0.23.0 lmdb datasets evaluate  scipy opencv-python matplotlib imageio piq==0.7.0 safetensors gradio
 python setup.py  develop
 ```
 

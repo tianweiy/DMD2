@@ -1,4 +1,5 @@
 # A single unified model that wraps both the generator and discriminator
+from peft import LoraConfig, get_peft_model_state_dict, set_peft_model_state_dict
 from diffusers import UNet2DConditionModel, AutoencoderKL, AutoencoderTiny
 from main.utils import get_x0_from_noise, NoOpContext
 from main.sdxl.sdxl_text_encoder import SDXLTextEncoder
@@ -40,7 +41,34 @@ class SDUniModel(nn.Module):
                 subfolder="unet"
             ).float()
 
-            self.feedforward_model.requires_grad_(True)
+            if args.generator_lora:
+                self.feedforward_model.requires_grad_(False)
+                assert args.sdxl
+                lora_target_modules = [
+                    "to_q",
+                    "to_k",
+                    "to_v",
+                    "to_out.0",
+                    "proj_in",
+                    "proj_out",
+                    "ff.net.0.proj",
+                    "ff.net.2",
+                    "conv1",
+                    "conv2",
+                    "conv_shortcut",
+                    "downsamplers.0.conv",
+                    "upsamplers.0.conv",
+                    "time_emb_proj",
+                ]
+                lora_config = LoraConfig(
+                    r=args.lora_rank,
+                    target_modules=lora_target_modules,
+                    lora_alpha=args.lora_alpha,
+                    lora_dropout=args.lora_dropout
+                )
+                self.feedforward_model.add_adapter(lora_config)
+            else:
+                self.feedforward_model.requires_grad_(True)
 
             if self.gradient_checkpointing:
                 self.feedforward_model.enable_gradient_checkpointing()

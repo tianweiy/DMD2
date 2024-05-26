@@ -676,6 +676,11 @@ def parse_args():
     parser.add_argument("--gan_alone", action="store_true", help="only use the gan loss without dmd")
     parser.add_argument("--backward_simulation", action="store_true")
 
+    parser.add_argument("--generator_lora", action="store_true")
+    parser.add_argument("--lora_rank", type=int, default=64)
+    parser.add_argument("--lora_alpha", type=float, default=8)
+    parser.add_argument("--lora_dropout", type=float, default=0.0)
+    
     args = parser.parse_args()
     env_local_rank = int(os.environ.get("LOCAL_RANK", -1))
     if env_local_rank != -1 and env_local_rank != args.local_rank:

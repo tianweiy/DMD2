@@ -58,7 +58,6 @@ class ModelWrapper:
         self.num_train_timesteps = args.num_train_timesteps
         self.vae_downsample_ratio = self.image_resolution // self.latent_resolution
 
-        self.base_add_time_ids = self.build_condition_input()
         self.conditioning_timestep = args.conditioning_timestep 
 
         self.scheduler = DDIMScheduler.from_pretrained(
@@ -103,9 +102,9 @@ class ModelWrapper:
         generator.requires_grad_(False)
         return generator 
 
-    def build_condition_input(self):
-        original_size = (self.image_resolution, self.image_resolution)
-        target_size = (self.image_resolution, self.image_resolution)
+    def build_condition_input(self, height, width):
+        original_size = (height, width)
+        target_size = (height, width)
         crop_top_left = (0, 0)
 
         add_time_ids = list(original_size + crop_top_left + target_size)
@@ -196,7 +195,7 @@ class ModelWrapper:
 
         generator = torch.manual_seed(seed)
 
-        add_time_ids = self.base_add_time_ids.repeat(num_images, 1)
+        add_time_ids = self.build_condition_input(height, width).repeat(num_images, 1)
 
         noise = torch.randn(
             num_images, 4, height // self.vae_downsample_ratio, width // self.vae_downsample_ratio, 
@@ -301,7 +300,7 @@ def create_demo():
                         maximum=1536,
                         step=64,
                         value=1024,
-                        info="Image height in pixels."
+                        info="Image height in pixels. Set to 1024 for the best result"
                     )
                     width = gr.Slider(
                         label="Image Width",
@@ -309,7 +308,7 @@ def create_demo():
                         maximum=1536,
                         step=64,
                         value=1024,
-                        info="Image width in pixels."
+                        info="Image width in pixels. Set to 1024 for the best result"
                     )
             with gr.Column():
                 result = gr.Gallery(label="Generated Images", show_label=False, elem_id="gallery", height=1024)

@@ -56,6 +56,7 @@ class ModelWrapper:
         self.image_resolution = args.image_resolution
         self.latent_resolution = args.latent_resolution
         self.num_train_timesteps = args.num_train_timesteps
+        self.vae_downsample_ratio = self.image_resolution // self.latent_resolution
 
         self.base_add_time_ids = self.build_condition_input()
         self.conditioning_timestep = args.conditioning_timestep 
@@ -183,6 +184,8 @@ class ModelWrapper:
         self,
         prompt: str,
         seed: int,
+        height: int,
+        width: int,
         num_images: int,
         fast_vae_decode: bool
     ):
@@ -196,7 +199,7 @@ class ModelWrapper:
         add_time_ids = self.base_add_time_ids.repeat(num_images, 1)
 
         noise = torch.randn(
-            num_images, 4, self.latent_resolution, self.latent_resolution, 
+            num_images, 4, height // self.vae_downsample_ratio, width // self.vae_downsample_ratio, 
             generator=generator
         ).to(device=self.device, dtype=self.DTYPE) 
 
@@ -292,6 +295,22 @@ def create_demo():
                         label="Use Tiny VAE for faster decoding",
                         value=True
                     )
+                    height = gr.Slider(
+                        label="Image Height",
+                        minimum=512,
+                        maximum=1536,
+                        step=64,
+                        value=1024,
+                        info="Image height in pixels."
+                    )
+                    width = gr.Slider(
+                        label="Image Width",
+                        minimum=512,
+                        maximum=1536,
+                        step=64,
+                        value=1024,
+                        info="Image width in pixels."
+                    )
             with gr.Column():
                 result = gr.Gallery(label="Generated Images", show_label=False, elem_id="gallery", height=1024)
 
@@ -300,6 +319,8 @@ def create_demo():
         inputs = [
             prompt,
             seed,
+            height,
+            width,
             num_images,
             fast_vae_decode
         ]

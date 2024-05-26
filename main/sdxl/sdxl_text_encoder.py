@@ -1,21 +1,15 @@
-from main.utils import import_model_class_from_model_name_or_path 
+from transformers import CLIPTextModel, CLIPTextModelWithProjection
 import torch 
 
 class SDXLTextEncoder(torch.nn.Module):
     def __init__(self, args, accelerator, dtype=torch.float32) -> None:
         super().__init__()
-        text_encoder_cls_one = import_model_class_from_model_name_or_path(
-            args.model_id, args.revision
-        )
-        text_encoder_cls_two = import_model_class_from_model_name_or_path(
-            args.model_id, args.revision, subfolder="text_encoder_2"
-        )
 
-        self.text_encoder_one = text_encoder_cls_one.from_pretrained(
+        self.text_encoder_one = CLIPTextModel.from_pretrained(
             args.model_id, subfolder="text_encoder", revision=args.revision
         ).to(accelerator.device).to(dtype=dtype)
 
-        self.text_encoder_two = text_encoder_cls_two.from_pretrained(
+        self.text_encoder_two = CLIPTextModelWithProjection.from_pretrained(
             args.model_id, subfolder="text_encoder_2", revision=args.revision
         ).to(accelerator.device).to(dtype=dtype)
 

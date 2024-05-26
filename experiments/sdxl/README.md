@@ -22,7 +22,7 @@ bash scripts/download_hf_checkpoint.sh $CHECKPOINT_NAME $OUTPUT_PATH
 
 ### Download Base Diffusion Models and Training Data
 ```bash
-export CHECKPOINT_PATH="" # change this to your own checkpoint folder 
+export CHECKPOINT_PATH="" # change this to your own checkpoint folder (this should be a central directory shared across nodes)
 export WANDB_ENTITY="" # change this to your own wandb entity
 export WANDB_PROJECT="" # change this to your own wandb project
 export MASTER_IP=""  # change this to your own master ip

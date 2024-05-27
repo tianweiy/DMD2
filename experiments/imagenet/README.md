@@ -43,7 +43,7 @@ bash experiments/imagenet/imagenet_gan_classifier_genloss3e-3_diffusion1000_lr2e
 
 # on the same node, start a testing process that continually reads from the checkpoint folder and evaluate the FID 
 # Change TIMESTAMP_TBD to the real one
-python main/test_folder.py \
+python main/edm/test_folder_edm.py \
     --folder $CHECKPOINT_PATH/imagenet_gan_classifier_genloss3e-3_diffusion1000_lr2e-6_scratch/TIMESTAMP_TBD \
     --wandb_name test_imagenet_gan_classifier_genloss3e-3_diffusion1000_lr2e-6_scratch \
     --wandb_entity $WANDB_ENTITY \

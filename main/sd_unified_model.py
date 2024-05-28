@@ -1,11 +1,11 @@
 # A single unified model that wraps both the generator and discriminator
-from peft import LoraConfig, get_peft_model_state_dict, set_peft_model_state_dict
 from diffusers import UNet2DConditionModel, AutoencoderKL, AutoencoderTiny
 from main.utils import get_x0_from_noise, NoOpContext
 from main.sdxl.sdxl_text_encoder import SDXLTextEncoder
 from main.sd_guidance import SDGuidance
 from transformers import CLIPTextModel
 from accelerate.utils import broadcast
+from peft import LoraConfig
 from torch import nn
 import torch 
 

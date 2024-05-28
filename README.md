@@ -75,6 +75,46 @@ python -m demo.text_to_image_sdxl --checkpoint_path SDXL_CKPT_PATH --precision f
 python -m demo.text_to_image_sdxl --num_step 1 --checkpoint_path SDXL_CKPT_PATH --precision float16 --conditioning_timestep 399
 ```
 
+We can also use the standard diffuser pipeline:
+
+4-step generation 
+
+```.bash
+import torch
+from diffusers import DiffusionPipeline, UNet2DConditionModel, LCMScheduler
+from huggingface_hub import hf_hub_download
+from safetensors.torch import load_file
+base_model_id = "stabilityai/stable-diffusion-xl-base-1.0"
+repo_name = "tianweiy/DMD2"
+ckpt_name = "dmd2_sdxl_4step_unet.bin"
+# Load model.
+unet = UNet2DConditionModel.from_config(base_model_id, subfolder="unet").to("cuda", torch.float16)
+unet.load_state_dict(hf_hub_download(repo_name, ckpt_name))
+pipe = DiffusionPipeline.from_pretrained(base_model_id, unet=unet, torch_dtype=torch.float16, variant="fp16").to("cuda")
+pipe.scheduler = LCMScheduler.from_config(pipe.scheduler.config)
+prompt="a photo of a cat"
+image=pipe(prompt=prompt, num_inference_steps=4, guidance_scale=0).images[0]
+```
+
+1-step generation 
+
+```.bash
+import torch
+from diffusers import DiffusionPipeline, UNet2DConditionModel, LCMScheduler
+from huggingface_hub import hf_hub_download
+from safetensors.torch import load_file
+base_model_id = "stabilityai/stable-diffusion-xl-base-1.0"
+repo_name = "tianweiy/DMD2"
+ckpt_name = "dmd2_sdxl_1step_unet.bin"
+# Load model.
+unet = UNet2DConditionModel.from_config(base_model_id, subfolder="unet").to("cuda", torch.float16)
+unet.load_state_dict(hf_hub_download(repo_name, ckpt_name))
+pipe = DiffusionPipeline.from_pretrained(base_model_id, unet=unet, torch_dtype=torch.float16, variant="fp16").to("cuda")
+pipe.scheduler = LCMScheduler.from_config(pipe.scheduler.config)
+prompt="a photo of a cat"
+image=pipe(prompt=prompt, num_inference_steps=1, guidance_scale=0, timesteps=[399]).images[0]
+```
+
 Pretrained models can be found in [ImageNet](experiments/imagenet/README.md) and [SDXL](experiments/sdxl/README.md). 
 
 ## Training and Evaluation 
@@ -98,6 +138,8 @@ Improved Distribution Matching Distillation is released under [Creative Commons 
 ## Known Issues 
 
 - [ ] Current FSDP for SDXL training is really slow; help is greatly appreciated!
+- [ ] Current LORA training is actually slower than the full finetuning and takes the same amount of memory; help is greatly appreciated!
+
 
 ## Citation 
 

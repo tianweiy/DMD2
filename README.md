@@ -57,13 +57,13 @@ python setup.py  develop
 
 ## Inference Example
 
-To reproduce our ImageNet results, run:
+#### ImageNet 
 
 ```.bash
 python -m demo.imagenet_example  --checkpoint_path IMAGENET_CKPT_PATH 
 ```
 
-To try our text-to-image generation demo, run:
+#### Text-to-Image 
 
 ```.bash
 # Note: on the demo page, click ``Use Tiny VAE for faster decoding'' to enable much faster speed and lower memory consumption using a Tiny VAE from [madebyollin](https://huggingface.co/madebyollin/taesdxl)
@@ -77,7 +77,7 @@ python -m demo.text_to_image_sdxl --num_step 1 --checkpoint_path SDXL_CKPT_PATH 
 
 We can also use the standard diffuser pipeline:
 
-4-step generation 
+#### 4-step generation 
 
 ```.bash
 import torch
@@ -86,7 +86,7 @@ from huggingface_hub import hf_hub_download
 from safetensors.torch import load_file
 base_model_id = "stabilityai/stable-diffusion-xl-base-1.0"
 repo_name = "tianweiy/DMD2"
-ckpt_name = "dmd2_sdxl_4step_unet.bin"
+ckpt_name = "dmd2_sdxl_4step_unet_fp16.bin"
 # Load model.
 unet = UNet2DConditionModel.from_config(base_model_id, subfolder="unet").to("cuda", torch.float16)
 unet.load_state_dict(torch.load(hf_hub_download(repo_name, ckpt_name), map_location="cuda"))
@@ -96,7 +96,7 @@ prompt="a photo of a cat"
 image=pipe(prompt=prompt, num_inference_steps=4, guidance_scale=0).images[0]
 ```
 
-1-step generation 
+#### 1-step generation 
 
 ```.bash
 import torch
@@ -105,7 +105,7 @@ from huggingface_hub import hf_hub_download
 from safetensors.torch import load_file
 base_model_id = "stabilityai/stable-diffusion-xl-base-1.0"
 repo_name = "tianweiy/DMD2"
-ckpt_name = "dmd2_sdxl_1step_unet.bin"
+ckpt_name = "dmd2_sdxl_1step_unet_fp16.bin"
 # Load model.
 unet = UNet2DConditionModel.from_config(base_model_id, subfolder="unet").to("cuda", torch.float16)
 unet.load_state_dict(torch.load(hf_hub_download(repo_name, ckpt_name), map_location="cuda"))

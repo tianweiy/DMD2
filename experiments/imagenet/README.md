@@ -8,7 +8,7 @@ We trained ImageNet using mixed-precision in BF16 format, adapting the EDM's cod
 | ----------- | --- | ---- | ----- | ----- |
 | [imagenet_gan_classifier_genloss3e-3_diffusion1000_lr2e-6_scratch](./imagenet_gan_classifier_genloss3e-3_diffusion1000_lr2e-6_scratch.sh) | 1.51 | [link](https://huggingface.co/tianweiy/DMD2/tree/main/model/imagenet/imagenet_gan_classifier_genloss3e-3_diffusion1000_lr2e-6_scratch_fid1.51_checkpoint_model_193500/) | 200k | 53 |
 | [imagenet_lr2e-6_scratch](./imagenet_lr2e-6_scratch.sh) | 2.61 | [link](https://huggingface.co/tianweiy/DMD2/tree/main/model/imagenet/imagenet_lr2e-6_scratch_fid2.61_checkpoint_model_405500/) | 410k | 70 |
-| [imagenet_gan_classifier_genloss3e-3_diffusion1000_lr5e-7_resume*](./imagenet_gan_classifier_genloss3e-3_diffusion1000_lr5e-7_resume.sh) | 1.28 | [link](https://huggingface.co/tianweiy/DMD2/tree/main/model/imagenet/imagenet_gan_classifier_genloss3e-3_diffusion1000_lr5e-7_resume_fid1.28_checkpoint_model_548000/) | 140K | 70 |
+| [imagenet_gan_classifier_genloss3e-3_diffusion1000_lr5e-7_resume*](./imagenet_gan_classifier_genloss3e-3_diffusion1000_lr5e-7_resume.sh) | 1.28 | [link](https://huggingface.co/tianweiy/DMD2/tree/main/model/imagenet/imagenet_gan_classifier_genloss3e-3_diffusion1000_lr5e-7_resume_fid1.28_checkpoint_model_548000/) | 140K | 38 |
 
 *The final model was resumed from the best checkpoint of the **imagenet_lr2e-6_scratch** run and trained for an additional 140,000 iterations. 
 

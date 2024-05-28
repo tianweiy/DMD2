@@ -99,3 +99,5 @@ python main/sdxl/test_folder_sdxl.py \
 ```
 
 Please refer to [train_sd.py](../../main/train_sd.py) for various training options. Notably, if the `--delete_ckpts` flag is set to `True`, all checkpoints except the latest one will be deleted during training. Additionally, you can use the `--cache_dir` flag to specify a location with larger storage capacity. The number of checkpoints stored in `cache_dir` is controlled by the `max_checkpoint` argument.
+
+For LORA training, add the `--generator_lora` flag to the training command. The final checkpoint can be converted to a LORA model using the [extract_lora_module.py](../../main/sdxl/extract_lora_module.py) script.

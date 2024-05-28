@@ -10,6 +10,7 @@ from main.utils import SDTextDataset
 from transformers import AutoTokenizer
 from accelerate.utils import set_seed
 from accelerate import Accelerator
+from peft import LoraConfig
 from tqdm import tqdm 
 import numpy as np 
 import argparse 
@@ -22,7 +23,7 @@ import os
 
 logger = get_logger(__name__, log_level="INFO")
 
-def create_generator(checkpoint_path, base_model=None):
+def create_generator(checkpoint_path, base_model=None, args=None):
     if base_model is None:
         generator = UNet2DConditionModel.from_pretrained(
             "stabilityai/stable-diffusion-xl-base-1.0",
@@ -31,6 +32,31 @@ def create_generator(checkpoint_path, base_model=None):
         generator.requires_grad_(False)
     else:
         generator = base_model
+
+    if args.generator_lora:
+        lora_target_modules = [
+            "to_q",
+            "to_k",
+            "to_v",
+            "to_out.0",
+            "proj_in",
+            "proj_out",
+            "ff.net.0.proj",
+            "ff.net.2",
+            "conv1",
+            "conv2",
+            "conv_shortcut",
+            "downsamplers.0.conv",
+            "upsamplers.0.conv",
+            "time_emb_proj",
+        ]
+        lora_config = LoraConfig(
+            r=args.lora_rank,
+            target_modules=lora_target_modules,
+            lora_alpha=args.lora_alpha,
+            lora_dropout=args.lora_dropout
+        )
+        generator.add_adapter(lora_config) 
 
     # sometime the state_dict is not fully saved yet 
     counter = 0
@@ -150,6 +176,10 @@ def evaluate():
     parser.add_argument("--checkpoint_path", type=str, help="specify a single checkpoint instead of a folder")
     parser.add_argument("--guidance_scale", type=float, default=6)
     parser.add_argument("--result_path", type=str)
+    parser.add_argument("--generator_lora", action="store_true")
+    parser.add_argument("--lora_rank", type=int, default=64)
+    parser.add_argument("--lora_alpha", type=float, default=8)
+    parser.add_argument("--lora_dropout", type=float, default=0.0)
 
     args = parser.parse_args()
 
@@ -284,7 +314,8 @@ def evaluate():
 
             generator = create_generator(
                 os.path.join(checkpoint, "pytorch_model.bin"), 
-                base_model=generator
+                base_model=generator,
+                args=args
             )
 
             if generator is None:

@@ -89,7 +89,7 @@ repo_name = "tianweiy/DMD2"
 ckpt_name = "dmd2_sdxl_4step_unet.bin"
 # Load model.
 unet = UNet2DConditionModel.from_config(base_model_id, subfolder="unet").to("cuda", torch.float16)
-unet.load_state_dict(hf_hub_download(repo_name, ckpt_name))
+unet.load_state_dict(torch.load(hf_hub_download(repo_name, ckpt_name), map_location="cuda"))
 pipe = DiffusionPipeline.from_pretrained(base_model_id, unet=unet, torch_dtype=torch.float16, variant="fp16").to("cuda")
 pipe.scheduler = LCMScheduler.from_config(pipe.scheduler.config)
 prompt="a photo of a cat"
@@ -108,7 +108,7 @@ repo_name = "tianweiy/DMD2"
 ckpt_name = "dmd2_sdxl_1step_unet.bin"
 # Load model.
 unet = UNet2DConditionModel.from_config(base_model_id, subfolder="unet").to("cuda", torch.float16)
-unet.load_state_dict(hf_hub_download(repo_name, ckpt_name))
+unet.load_state_dict(torch.load(hf_hub_download(repo_name, ckpt_name), map_location="cuda"))
 pipe = DiffusionPipeline.from_pretrained(base_model_id, unet=unet, torch_dtype=torch.float16, variant="fp16").to("cuda")
 pipe.scheduler = LCMScheduler.from_config(pipe.scheduler.config)
 prompt="a photo of a cat"

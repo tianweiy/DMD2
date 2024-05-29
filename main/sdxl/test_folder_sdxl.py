@@ -74,6 +74,10 @@ def create_generator(checkpoint_path, base_model=None, args=None):
                 return None
 
     print(generator.load_state_dict(state_dict, strict=True))
+
+    if args.generator_lora:
+        generator.fuse_lora()
+
     return generator 
 
 def build_condition_input(resolution, accelerator):

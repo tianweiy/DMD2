@@ -20,7 +20,7 @@ torchrun --nnodes 8 --nproc_per_node=8 --rdzv_id=2345 \
     --wandb_name "sdxl_lr1e-5_8node_ode_pretraining_10k_cond399"  \
     --sdxl \
     --num_ode_pairs 10000 \
-    --ode_pair_path $CHECKPOINT_PATH/laion6.25_pair_generation_sdxl_guidance6_full_lmdb/ \
+    --ode_pair_path $CHECKPOINT_PATH/sdxl_ode_pair_10k_lmdb/ \
     --ode_batch_size 4  \
     --conditioning_timestep 399 \
     --tiny_vae \

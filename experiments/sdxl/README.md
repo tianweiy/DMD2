@@ -65,8 +65,10 @@ For 1-step model, we need an extra regression loss pretraining.
 First, download the 10K noise-image pairs
 
 ```bash
-bash scripts
+bash scripts/download_sdxl_ode_pair_10k_lmdb.sh $CHECKPOINT_PATH
 ```
+
+These pairs can be generated using [generate_noise_image_pairs_laion_sdxl.py](../../main/sdxl/generate_noise_image_pairs_laion_sdxl.py)
 
 Second, Pretrain the model with regression loss 
 
@@ -77,7 +79,7 @@ bash experiments/sdxl/sdxl_lr1e-5_8node_ode_pretraining_10k_cond399.sh $CHECKPOI
 Alternatively, you can skip the previous two steps and directly download the regression loss pretrained checkpoint 
 
 ```bash
-bash scripts/download_sdxl_1step_ode_pairs.sh $CHECKPOINT_PATH
+bash scripts/download_sdxl_1step_ode_pairs_ckpt.sh $CHECKPOINT_PATH
 ```
 
 Start the real training 

@@ -1,4 +1,4 @@
-# Improved Distribution Matching Distillation for Fast Image Synthesis [[4-step demo](https://913f7051c61c070e4e.gradio.live)][[1-step demo](https://154dfe6ee5c63946cc.gradio.live)][[ComfyUI](https://gist.github.com/comfyanonymous/fcce4ced378f74f4c46026b134faf27a)]
+# Improved Distribution Matching Distillation for Fast Image Synthesis [[4-step demo](https://6cf215173601f32482.gradio.live/)][[1-step demo](https://cc2622c0c132346c64.gradio.live/)][[ComfyUI](https://gist.github.com/comfyanonymous/fcce4ced378f74f4c46026b134faf27a)]
 
 Few-step Text-to-Image Generation.
 
@@ -51,7 +51,9 @@ conda activate dmd2
 
 pip install --upgrade anyio
 pip install torch==2.0.1  torchvision==0.15.2
-pip install  --upgrade diffusers peft wandb lmdb transformers accelerate==0.23.0 lmdb datasets evaluate  scipy opencv-python matplotlib imageio piq==0.7.0 safetensors gradio huggingface-hub==0.22.0
+pip install git+https://github.com/openai/CLIP.git
+
+pip install  --upgrade diffusers peft wandb lmdb transformers accelerate==0.23.0 lmdb datasets evaluate  scipy opencv-python matplotlib imageio piq==0.7.0 safetensors gradio huggingface-hub==0.22.0 clean-fid
 python setup.py  develop
 ```
 

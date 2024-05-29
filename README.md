@@ -50,10 +50,7 @@ conda create -n dmd2 python=3.8 -y
 conda activate dmd2 
 
 pip install --upgrade anyio
-pip install torch==2.0.1  torchvision==0.15.2
-pip install git+https://github.com/openai/CLIP.git
-
-pip install  --upgrade open_clip_torch image-reward diffusers peft wandb lmdb transformers accelerate==0.23.0 lmdb datasets evaluate  scipy opencv-python matplotlib imageio piq==0.7.0 safetensors gradio huggingface-hub==0.22.0 clean-fid
+pip install -r requirements.txt
 python setup.py  develop
 ```
 

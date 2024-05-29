@@ -95,7 +95,9 @@ unet.load_state_dict(torch.load(hf_hub_download(repo_name, ckpt_name), map_locat
 pipe = DiffusionPipeline.from_pretrained(base_model_id, unet=unet, torch_dtype=torch.float16, variant="fp16").to("cuda")
 pipe.scheduler = LCMScheduler.from_config(pipe.scheduler.config)
 prompt="a photo of a cat"
-image=pipe(prompt=prompt, num_inference_steps=4, guidance_scale=0).images[0]
+
+# LCMScheduler's default timesteps are different from the one we used for training 
+image=pipe(prompt=prompt, num_inference_steps=4, guidance_scale=0, timesteps=[999, 749, 499, 249]).images[0]
 ```
 
 #### 1-step generation 

@@ -78,7 +78,7 @@ We can also use the standard diffuser pipeline:
 
 #### 4-step generation 
 
-```.bash
+```python
 import torch
 from diffusers import DiffusionPipeline, UNet2DConditionModel, LCMScheduler
 from huggingface_hub import hf_hub_download
@@ -99,7 +99,7 @@ image=pipe(prompt=prompt, num_inference_steps=4, guidance_scale=0, timesteps=[99
 
 #### 1-step generation 
 
-```.bash
+```python
 import torch
 from diffusers import DiffusionPipeline, UNet2DConditionModel, LCMScheduler
 from huggingface_hub import hf_hub_download

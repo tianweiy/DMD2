@@ -30,33 +30,33 @@ def create_generator(checkpoint_path, base_model=None, args=None):
             subfolder="unet"
         ).float()
         generator.requires_grad_(False)
+
+        if args.generator_lora:
+            lora_target_modules = [
+                "to_q",
+                "to_k",
+                "to_v",
+                "to_out.0",
+                "proj_in",
+                "proj_out",
+                "ff.net.0.proj",
+                "ff.net.2",
+                "conv1",
+                "conv2",
+                "conv_shortcut",
+                "downsamplers.0.conv",
+                "upsamplers.0.conv",
+                "time_emb_proj",
+            ]
+            lora_config = LoraConfig(
+                r=args.lora_rank,
+                target_modules=lora_target_modules,
+                lora_alpha=args.lora_alpha,
+                lora_dropout=args.lora_dropout
+            )
+            generator.add_adapter(lora_config) 
     else:
         generator = base_model
-
-    if args.generator_lora:
-        lora_target_modules = [
-            "to_q",
-            "to_k",
-            "to_v",
-            "to_out.0",
-            "proj_in",
-            "proj_out",
-            "ff.net.0.proj",
-            "ff.net.2",
-            "conv1",
-            "conv2",
-            "conv_shortcut",
-            "downsamplers.0.conv",
-            "upsamplers.0.conv",
-            "time_emb_proj",
-        ]
-        lora_config = LoraConfig(
-            r=args.lora_rank,
-            target_modules=lora_target_modules,
-            lora_alpha=args.lora_alpha,
-            lora_dropout=args.lora_dropout
-        )
-        generator.add_adapter(lora_config) 
 
     # sometime the state_dict is not fully saved yet 
     counter = 0
@@ -74,9 +74,6 @@ def create_generator(checkpoint_path, base_model=None, args=None):
                 return None
 
     print(generator.load_state_dict(state_dict, strict=True))
-
-    if args.generator_lora:
-        generator.fuse_lora()
 
     return generator 
 

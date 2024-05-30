@@ -106,10 +106,10 @@ from huggingface_hub import hf_hub_download
 from safetensors.torch import load_file
 base_model_id = "stabilityai/stable-diffusion-xl-base-1.0"
 repo_name = "tianweiy/DMD2"
-ckpt_name = "dmd2_sdxl_4step_lora_fp16.bin"
+ckpt_name = "dmd2_sdxl_4step_lora_fp16.safetensors"
 # Load model.
 pipe = DiffusionPipeline.from_pretrained(base_model_id, torch_dtype=torch.float16, variant="fp16").to("cuda")
-pipe.load_lora_weights(hf_hub_download(repo, ckpt))
+pipe.load_lora_weights(hf_hub_download(repo_name, ckpt_name))
 pipe.fuse_lora()
 
 pipe.scheduler = LCMScheduler.from_config(pipe.scheduler.config)

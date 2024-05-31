@@ -1,4 +1,4 @@
-# Improved Distribution Matching Distillation for Fast Image Synthesis [[4-step demo](https://6cf215173601f32482.gradio.live/)][[1-step demo](https://cc2622c0c132346c64.gradio.live/)][[ComfyUI](https://gist.github.com/comfyanonymous/fcce4ced378f74f4c46026b134faf27a)]
+# Improved Distribution Matching Distillation for Fast Image Synthesis [[Huggingface Repo](https://huggingface.co/tianweiy/DMD2)][[ComfyUI](https://gist.github.com/comfyanonymous/fcce4ced378f74f4c46026b134faf27a)]
 
 Few-step Text-to-Image Generation.
 

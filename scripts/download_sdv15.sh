@@ -1,4 +1,4 @@
-$CHECKPOINT_PATH=$1
+CHECKPOINT_PATH=$1
 
 # training prompts 
 wget  https://huggingface.co/tianweiy/DMD2/resolve/main/data/laion/captions_laion_score6.25.pkl?download=true -O $CHECKPOINT_PATH/captions_laion_score6.25.pkl

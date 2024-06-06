@@ -181,7 +181,8 @@ gen_images = pipe(
   num_inference_steps=4,
   guidance_scale=0, 
   adapter_conditioning_scale=0.8, 
-  adapter_conditioning_factor=0.5
+  adapter_conditioning_factor=0.5,
+  timesteps=[999, 749, 499, 249]
 ).images[0]
 gen_images.save('out_canny.png')
 ```

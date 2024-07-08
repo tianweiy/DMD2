@@ -44,7 +44,7 @@ You can also add these few export to the bashrc file so that you don't need to r
 
 ```bash
 # start a training with 64 gpu. we need to run this script on all 8 nodes. 
-bash experiments/laion/laion6.25_sd_baseline_8node_guidance1.75_lr1e-5_seed10_dfake10_from_scratch.sh $CHECKPOINT_PATH  $WANDB_ENTITY $WANDB_PROJECT $MASTER_IP
+bash experiments/sdv1.5/laion6.25_sd_baseline_8node_guidance1.75_lr1e-5_seed10_dfake10_from_scratch.sh $CHECKPOINT_PATH  $WANDB_ENTITY $WANDB_PROJECT $MASTER_IP
 
 # on some other machine, start a testing process that continually reads from the checkpoint folder and evaluate the FID 
 # Change TIMESTAMP_TBD to the real one

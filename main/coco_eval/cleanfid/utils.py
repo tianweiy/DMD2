@@ -2,7 +2,7 @@ import numpy as np
 import torch
 import torchvision
 from PIL import Image
-from cleanfid.resize import build_resizer
+from main.coco_eval.cleanfid.resize import build_resizer
 import zipfile
 
 

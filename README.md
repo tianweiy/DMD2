@@ -218,10 +218,10 @@ Improved Distribution Matching Distillation is released under [Creative Commons 
 If you find DMD2 useful or relevant to your research, please kindly cite our papers:
 
 ```bib
-@article{yin2024improved,
+@inproceedings{yin2024improved,
     title={Improved Distribution Matching Distillation for Fast Image Synthesis},
     author={Yin, Tianwei and Gharbi, Micha{\"e}l and Park, Taesung and Zhang, Richard and Shechtman, Eli and Durand, Fredo and Freeman, William T},
-    journal={arXiv 2405.14867},
+    booktitle={NeurIPS},
     year={2024}
 }
 

@@ -6,7 +6,7 @@ Few-step Text-to-Image Generation.
 
 > [**Improved Distribution Matching Distillation for Fast Image Synthesis**](https://tianweiy.github.io/dmd2/),            
 > Tianwei Yin, Michaël Gharbi, Taesung Park, Richard Zhang, Eli Shechtman, Frédo Durand, William T. Freeman        
-> *arXiv technical report ([arXiv 2405.14867](https://arxiv.org/abs/2405.14867))*  
+> *NeurIPS 2024 ([arXiv 2405.14867](https://arxiv.org/abs/2405.14867))*  
 
 ## Contact 
 

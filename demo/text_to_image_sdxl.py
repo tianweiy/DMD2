@@ -31,7 +31,7 @@ class ModelWrapper:
         )
 
         self.tokenizer_two = AutoTokenizer.from_pretrained(
-            args.model_id, subfolder="tokenizer", revision=args.revision, use_fast=False
+            args.model_id, subfolder="tokenizer_2", revision=args.revision, use_fast=False
         )
 
         self.text_encoder = SDXLTextEncoder(args, accelerator, dtype=self.DTYPE)

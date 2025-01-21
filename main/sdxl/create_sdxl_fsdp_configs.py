@@ -13,7 +13,7 @@ def create_yaml_config(filename, rank, master_ip, args):
             "fsdp_auto_wrap_policy": "SIZE_BASED_WRAP",
             "fsdp_backward_prefetch_policy": "BACKWARD_PRE",
             "fsdp_forward_prefetch": False,
-            "fsdp_min_num_params": 3000,
+            "fsdp_min_num_params": 50000000,
             "fsdp_offload_params": False,
             "fsdp_sharding_strategy": args.sharding_strategy,
             "fsdp_state_dict_type": "SHARDED_STATE_DICT",

@@ -7,7 +7,7 @@ fsdp_config:
   fsdp_auto_wrap_policy: SIZE_BASED_WRAP
   fsdp_backward_prefetch_policy: BACKWARD_PRE
   fsdp_forward_prefetch: false
-  fsdp_min_num_params: 3000
+  fsdp_min_num_params: 50000000
   fsdp_offload_params: false
   fsdp_sharding_strategy: 1
   fsdp_state_dict_type: SHARDED_STATE_DICT

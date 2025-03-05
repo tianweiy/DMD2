@@ -86,9 +86,14 @@ from safetensors.torch import load_file
 base_model_id = "stabilityai/stable-diffusion-xl-base-1.0"
 repo_name = "tianweiy/DMD2"
 ckpt_name = "dmd2_sdxl_4step_unet_fp16.bin"
+
 # Load model.
-unet = UNet2DConditionModel.from_config(base_model_id, subfolder="unet").to("cuda", torch.float16)
-unet.load_state_dict(torch.load(hf_hub_download(repo_name, ckpt_name), map_location="cuda"))
+with torch.device("meta"):
+    unet = UNet2DConditionModel.from_config(base_model_id, subfolder="unet").to(torch.float16)
+state_dict_path = hf_hub_download(repo_name, ckpt_name)
+unet.load_state_dict(torch.load(state_dict_path), assign=True)
+unet.to("cuda")
+
 pipe = DiffusionPipeline.from_pretrained(base_model_id, unet=unet, torch_dtype=torch.float16, variant="fp16").to("cuda")
 pipe.scheduler = LCMScheduler.from_config(pipe.scheduler.config)
 prompt="a photo of a cat"
